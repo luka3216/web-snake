@@ -1,0 +1,14 @@
+{
+  "name": "snake",
+  "version": "1.0.0",
+  "description": "snake game",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lux",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
