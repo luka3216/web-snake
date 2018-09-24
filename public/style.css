@@ -9,11 +9,15 @@ body
 
 .snake
 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   align-self:center;
-  margin: 20px;
+  margin: 0;
   border: 2px solid black;
-  width: calc(var(--snake-block-size) * var(--snake-num-blocks));
-  height: calc(var(--snake-block-size) * var(--snake-num-blocks));
+  width: calc(var(--snake-block-size) * var(--snake-num-blocks-w));
+  height: calc(var(--snake-block-size) * var(--snake-num-blocks-h));
   display:flex;
 }
 .snake .snake-block
@@ -26,6 +30,7 @@ body
   border-radius: 38%;
   background-color: blue;
   transition: transform var(--snake-tick-time);
+  transform: translate(var(--x),var(--y));
 }
 .snake .snake-food
 {
@@ -36,15 +41,16 @@ body
   height: calc(var(--snake-block-size) - 4px);
   margin:1px;
   border-radius: 50%;
+  transform: translate(var(--x), var(--y));
 }
 
 .snake .message-overlay {
   position: absolute;
-  width: calc(var(--snake-block-size) * var(--snake-num-blocks));
-  height: calc(var(--snake-block-size) * var(--snake-num-blocks));
+  width: calc(var(--snake-block-size) * var(--snake-num-blocks-w));
+  height: calc(var(--snake-block-size) * var(--snake-num-blocks-h));
   background-color: rgba(120,120,120,0.8);
   color: white;
   z-index: 2;
   text-align: center;
-  line-height: calc(var(--snake-block-size) * var(--snake-num-blocks));
+  line-height: calc(var(--snake-block-size) * var(--snake-num-blocks-h));
 }

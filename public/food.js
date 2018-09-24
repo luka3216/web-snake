@@ -17,7 +17,7 @@ export class food {
     do {
       this.point = new point(
          Math.floor(Math.random() * this.snakegame.width),
-         Math.floor(Math.random() * this.snakegame.width)
+         Math.floor(Math.random() * this.snakegame.height)
       );
     } while (this.blockshere())
 

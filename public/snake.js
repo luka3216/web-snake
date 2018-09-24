@@ -1,28 +1,31 @@
 import { block } from './block.js';
 import { food } from './food.js';
-import { messageBoard} from './messageBoard.js'
+import { messageBoard } from './messageBoard.js'
 
 export class snake {
   constructor(
     blockSize /*block size in pixels */,
-    width, /* numbers of block spaces in one row or column */
+    width, /* numbers of block spaces in one row */
+    height, /* numbers of block spaces in one column */
     frameTime,
     minFrameTime,
     updateRate
   ) {
     this.blockSize = blockSize;
     this.width = width;
+    this.height = height;
 
     this.snakediv = document.createElement('div');
     this.snakediv.setAttribute('class', 'snake');
     this.snakediv.style.setProperty('--snake-block-size', blockSize + 'px');
-    this.snakediv.style.setProperty('--snake-num-blocks', width);   
+    this.snakediv.style.setProperty('--snake-num-blocks-w', width);
+    this.snakediv.style.setProperty('--snake-num-blocks-h', height);
     document.body.appendChild(this.snakediv);
 
     this.msgBoard = new messageBoard();
     this.snakediv.appendChild(this.msgBoard.domObj);
 
-    window.addEventListener('click', () => { this.startgame() })
+    window.addEventListener('click', (ev) => { this.startgame(ev) })
     window.addEventListener('keydown', (ev) => { this.changedirection(ev.key) })
 
     this.initBaseSnake();
@@ -31,16 +34,16 @@ export class snake {
     this.lastdirection = this.direction;
     this.updateFrameTime(frameTime, updateRate);
     this.minFrameTime = minFrameTime;
-    this.updateRate= updateRate;
+    this.updateRate = updateRate;
 
     this.food = new food(this);
     this.snakediv.appendChild(this.food.getspan());
   }
 
   initBaseSnake() {
-    this.head = new block(new point(this.width / 2 - 1, this.width / 2 - 1), this);
-    let second = new block(new point(this.width / 2 - 2, this.width / 2 - 1), this);
-    this.last = new block(new point(this.width / 2 - 3, this.width / 2 - 1), this);
+    this.head = new block(new point(this.width / 2 - 1, this.height / 2 - 1), this);
+    let second = new block(new point(this.width / 2 - 2, this.height / 2 - 1), this);
+    this.last = new block(new point(this.width / 2 - 3, this.height / 2 - 1), this);
 
     this.head.next = second;
     second.next = this.last;
@@ -49,15 +52,49 @@ export class snake {
     this.snakediv.appendChild(second.getspan());
     this.snakediv.appendChild(this.last.getspan());
 
-    this.spaceLeft = this.width * this.width - 3;
+    this.spaceLeft = this.width * this.height - 3;
   }
 
-  startgame() {
+  startgame(event) {
     if (!this.active) {
       this.active = true;
       this.msgBoard.hide();
       this.move();
+    } else {
+      this.processClick(event);
     }
+  }
+
+  processClick(event) {
+    let midX = window.innerWidth / 2;
+    let y = event.clientX * (window.innerHeight / window.innerWidth);
+    let keyEquivalent;
+    if (event.clientX > midX) {
+      if (event.clientY < y) {
+        if (event.clientY > window.innerHeight - y)
+        keyEquivalent = 'ArrowRight';
+        else 
+        keyEquivalent = 'ArrowUp';
+      }
+      else 
+      keyEquivalent = 'ArrowDown';
+    }
+    if (event.clientX <= midX) {
+      if (event.clientY < window.innerHeight - y) {
+        if (event.clientY > y)
+        keyEquivalent = 'ArrowLeft';
+        else 
+        keyEquivalent = 'ArrowUp';
+      }
+      else 
+      keyEquivalent = 'ArrowDown';
+    }
+    this.changedirection(keyEquivalent);
+  }
+
+  func(x) {
+    k = window.innerHeight / window.innerWidth;
+    y = x * k;
   }
 
   updateFrameTime(newtime) {
@@ -68,14 +105,14 @@ export class snake {
   move() {
     setTimeout(() => {
       if (!this.nextDirection) {
-        if (this.lastdirection.x + this.direction.x != 0 /*true if opposite direction*/) 
+        if (this.lastdirection.x + this.direction.x != 0 /*true if opposite direction*/)
           this.nextDirection = this.direction;
         else
           this.nextDirection = this.lastdirection;
       }
 
       let newPoint = new point(this.head.point.x + this.nextDirection.x, this.head.point.y + this.nextDirection.y);
-      if (newPoint.exceedsBoundaries(this.width)) {
+      if (newPoint.exceedsBoundaries(this.width, this.height)) {
         this.signifyCollision();
         this.msgBoard.announceLoss();
         return;
@@ -142,10 +179,13 @@ export class snake {
   }
 
   updateDomElement(elem) {
-    elem.domObj.style.setProperty('transform', 'translate(' + elem.point.x * this.blockSize + 'px, ' + elem.point.y * this.blockSize + 'px)');
+   // elem.domObj.style.setProperty('transform', 'translate(' + elem.point.x * this.blockSize + 'px, ' + elem.point.y * this.blockSize + 'px)');
+   elem.domObj.style.setProperty('--x',  elem.point.x * this.blockSize + 'px');
+   elem.domObj.style.setProperty('--y',  elem.point.y * this.blockSize + 'px');
+   
   }
 
-  signifyCollision() { 
+  signifyCollision() {
     this.head.domObj.style.zIndex = 1;
     this.head.domObj.style.setProperty('background-color', 'rgb(255, 87, 87)');
   }
@@ -162,8 +202,8 @@ export class point {
     return this.x === other.x && this.y == other.y;
   }
 
-  exceedsBoundaries(width) {
-    if (this.y < 0 || this.y >= width || this.x < 0 || this.x >= width) {
+  exceedsBoundaries(width, height) {
+    if (this.y < 0 || this.y >= height || this.x < 0 || this.x >= width) {
       return true;
     }
     return false;
