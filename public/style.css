@@ -29,7 +29,7 @@ body
   margin:1px;
   border-radius: 38%;
   background-color: blue;
-  transition: transform var(--snake-tick-time);
+  transition: transform var(--snake-tick-time) linear;
   transform: translate(var(--x),var(--y));
 }
 .snake .snake-food
